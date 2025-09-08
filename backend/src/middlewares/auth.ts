@@ -7,7 +7,7 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
+import * as jwt from 'jsonwebtoken';
 import { JWT_SECRET } from '../config';
 import User from '../models/User';
 
@@ -42,7 +42,7 @@ export const requireAuth = async (req: Request, res: Response, next: NextFunctio
   const token = header.split(' ')[1];
 
   try {
-    const payload = jwt.verify(token, JWT_SECRET) as JwtPayload;
+    const payload = (jwt.verify as any)(token, JWT_SECRET) as JwtPayload;
     const user = await User.findById(payload.userId).lean();
 
     if (!user) {

@@ -8,7 +8,7 @@
 
 import { Request, Response } from "express";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
+import * as jwt from "jsonwebtoken";
 import User from "../models/User";
 import { JWT_SECRET, JWT_EXPIRES_IN } from "../config";
 
@@ -70,7 +70,7 @@ export const login = async (req: Request, res: Response) => {
     return res.status(401).json({ error: "Invalid credentials" });
   }
 
-  const token = jwt.sign({ userId: user._id }, JWT_SECRET, {
+  const token = (jwt.sign as any)({ userId: user.id }, JWT_SECRET, {
     expiresIn: JWT_EXPIRES_IN,
   });
 
