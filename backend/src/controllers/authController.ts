@@ -70,8 +70,9 @@ export const login = async (req: Request, res: Response) => {
     return res.status(401).json({ error: "Invalid credentials" });
   }
 
+  const expiresInSeconds = typeof JWT_EXPIRES_IN === 'string' ? parseInt(JWT_EXPIRES_IN, 10) : JWT_EXPIRES_IN;
   const token = (jwt.sign as any)({ userId: user.id }, JWT_SECRET, {
-    expiresIn: JWT_EXPIRES_IN,
+    expiresIn: expiresInSeconds,
   });
 
   res.json({ accessToken: token, expiresIn: JWT_EXPIRES_IN });
