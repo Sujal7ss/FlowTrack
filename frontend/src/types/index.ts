@@ -63,6 +63,7 @@ export interface TransactionFilters {
   type?: 'income' | 'expense';
   category?: string;
   dateRange?: [string, string];
+  search?: string;
   page?: number;
   limit?: number;
 }

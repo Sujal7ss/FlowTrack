@@ -84,7 +84,7 @@ const LandingPage: React.FC = () => {
             <Button
               type="primary"
               size={screens.xs ? "middle" : "large"}
-              href="/signup"
+              href="/login"
               icon={<ArrowRightOutlined />}
               block={screens.xs}
             >

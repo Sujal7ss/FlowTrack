@@ -86,6 +86,19 @@ const Login: React.FC = () => {
 
             <Form.Item>
               <Button
+                type="default"
+                className="w-full mb-2"
+                size="large"
+                onClick={() => {
+                  form.setFieldsValue({
+                    email: 'alice@example.com',
+                    password: 'pass123',
+                  });
+                }}
+              >
+                Demo Login
+              </Button>
+              <Button
                 type="primary"
                 htmlType="submit"
                 className="w-full"

@@ -1,11 +1,25 @@
 import React from 'react';
-import { DatePicker, Select, Input } from 'antd';
-import { SearchOutlined } from '@ant-design/icons';
+import { DatePicker, Select } from 'antd';
 import dayjs from 'dayjs';
 import type { TransactionFilters } from '../../types';
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;
+
+const CATEGORIES = {
+  expense: [
+    'Food & Dining',
+    'Transportation',
+    'Shopping',
+    'Entertainment',
+    'Bills & Utilities',
+    'Healthcare',
+    'Education',
+    'Travel',
+    'Other',
+  ],
+  income: ['Salary', 'Freelance', 'Business', 'Investment', 'Gift', 'Other'],
+};
 
 interface Props {
   filters: TransactionFilters;
@@ -25,12 +39,22 @@ const TransactionFiltersBar: React.FC<Props> = ({ filters, onChange }) => {
         <Option value="expense">Expense</Option>
       </Select>
 
-      <Input
-        placeholder="Search category"
-        prefix={<SearchOutlined />}
+      <Select
+        placeholder="Filter by category"
         allowClear
-        onChange={(e) => onChange('category', e.target.value || undefined)}
-      />
+        showSearch
+        filterOption={(input, option) =>
+          (option?.children as string).toLowerCase().includes(input.toLowerCase())
+        }
+        onChange={(value) => onChange('category', value)}
+        value={filters.category}
+      >
+        {(filters.type ? CATEGORIES[filters.type] : [...CATEGORIES.expense, ...CATEGORIES.income]).map((category) => (
+          <Option key={category} value={category}>
+            {category}
+          </Option>
+        ))}
+      </Select>
 
       <RangePicker
         placeholder={['Start Date', 'End Date']}
