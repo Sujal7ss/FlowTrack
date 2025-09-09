@@ -93,4 +93,26 @@ export interface Transaction {
   date: string;
   createdAt: string;
   updatedAt: string;
-}s
+}
+
+export interface Receipt {
+  id: string;
+  filename: string;
+  url: string;
+  extractedText: string;
+  confirmed: boolean;
+  transactionId?: string;
+  createdAt: string;
+}
+
+export interface ReceiptUploadResponse {
+  receipt: Receipt;
+}
+
+export interface ReceiptConfirmRequest {
+  type: 'income' | 'expense';
+  amount: number;
+  category: string;
+  description: string;
+  date: string;
+}

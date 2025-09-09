@@ -24,6 +24,7 @@ const CATEGORIES = {
 
 interface TransactionFormProps {
   transaction?: Transaction;
+  initialData?: TransactionRequest;
   visible: boolean;
   onClose: () => void;
   onSuccess: () => void;
@@ -31,6 +32,7 @@ interface TransactionFormProps {
 
 const TransactionForm: React.FC<TransactionFormProps> = ({
   transaction,
+  initialData,
   visible,
   onClose,
   onSuccess,
@@ -46,11 +48,11 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
     formState: { errors },
   } = useForm<TransactionRequest>({
     defaultValues: {
-      type: transaction?.type || 'expense',
-      amount: transaction?.amount || undefined,
-      category: transaction?.category || '',
-      description: transaction?.description || '',
-      date: transaction?.date || dayjs().format('YYYY-MM-DD'),
+      type: transaction?.type || initialData?.type || 'expense',
+      amount: transaction?.amount || initialData?.amount || undefined,
+      category: transaction?.category || initialData?.category || '',
+      description: transaction?.description || initialData?.description || '',
+      date: transaction?.date || initialData?.date || dayjs().format('YYYY-MM-DD'),
     },
   });
 
@@ -65,8 +67,16 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
         description: transaction.description,
         date: transaction.date,
       });
+    } else if (initialData) {
+      reset({
+        type: initialData.type,
+        amount: initialData.amount,
+        category: initialData.category,
+        description: initialData.description,
+        date: initialData.date,
+      });
     }
-  }, [transaction, reset]);
+  }, [transaction, initialData, reset]);
 
   const onSubmit = async (data: TransactionRequest) => {
     try {
