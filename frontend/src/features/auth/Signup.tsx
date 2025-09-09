@@ -1,30 +1,25 @@
 import React from 'react';
 import { Form, Input, Button, Card, Typography } from 'antd';
-import { UserOutlined, LockOutlined } from '@ant-design/icons';
-import { useLogin } from "../../hooks/auth"
-import { useNavigate, useLocation } from 'react-router-dom';
-import type { LoginRequest } from '../../types';
+import { UserOutlined, LockOutlined, MailOutlined } from '@ant-design/icons';
+import { useSignup } from "../../hooks/auth"
+import { useNavigate } from 'react-router-dom';
+import type { SignupRequest } from '../../types';
 
 const { Title } = Typography;
 
-const Login: React.FC = () => {
+const Signup: React.FC = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const loginMutation = useLogin();
+  const signupMutation = useSignup();
   const [form] = Form.useForm();
 
-  const onSubmit = async (values: LoginRequest) => {
+  const onSubmit = async (values: SignupRequest) => {
     try {
-      await loginMutation.mutate(values);
-      const from = (location.state as { from?: { pathname: string } })?.from?.pathname || '/dashboard';
-      navigate(from, { replace: true });
+      await signupMutation.mutate(values);
+      navigate('/login');
     } catch {
       // Error handled by mutation
     }
   };
-
-  // Demo credentials message
-  // Removed to avoid Antd static function warning
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -34,7 +29,7 @@ const Login: React.FC = () => {
             <Title level={2} className="text-gray-900">
               Personal Finance Assistant
             </Title>
-            <p className="text-gray-600">Sign in to manage your finances</p>
+            <p className="text-gray-600">Create your account</p>
           </div>
 
           <Form
@@ -43,10 +38,24 @@ const Login: React.FC = () => {
             size="large"
             layout="vertical"
             initialValues={{
+              name: '',
               email: '',
               password: '',
             }}
           >
+            <Form.Item
+              label="Name"
+              name="name"
+              rules={[
+                { required: true, message: 'Please enter your name' },
+              ]}
+            >
+              <Input
+                prefix={<UserOutlined />}
+                placeholder="Enter your name"
+              />
+            </Form.Item>
+
             <Form.Item
               label="Email"
               name="email"
@@ -56,7 +65,7 @@ const Login: React.FC = () => {
               ]}
             >
               <Input
-                prefix={<UserOutlined />}
+                prefix={<MailOutlined />}
                 placeholder="Enter your email"
                 type="email"
               />
@@ -81,19 +90,19 @@ const Login: React.FC = () => {
                 type="primary"
                 htmlType="submit"
                 className="w-full"
-                loading={loginMutation.isPending}
+                loading={signupMutation.isPending}
                 size="large"
               >
-                Sign In
+                Sign Up
               </Button>
             </Form.Item>
           </Form>
 
           <div className="text-center mt-4">
             <Typography.Text>
-              Don't have an account?{' '}
-              <Typography.Link onClick={() => navigate('/signup')}>
-                Sign Up
+              Already have an account?{' '}
+              <Typography.Link onClick={() => navigate('/login')}>
+                Sign In
               </Typography.Link>
             </Typography.Text>
           </div>
@@ -103,4 +112,4 @@ const Login: React.FC = () => {
   );
 };
 
-export default Login;
+export default Signup;
