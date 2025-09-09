@@ -1,6 +1,7 @@
 import React from 'react';
 import { DatePicker, Select, Input } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
+import dayjs from 'dayjs';
 import type { TransactionFilters } from '../../types';
 
 const { RangePicker } = DatePicker;
@@ -36,8 +37,8 @@ const TransactionFiltersBar: React.FC<Props> = ({ filters, onChange }) => {
         onChange={(dates) => {
           if (dates && dates.length === 2) {
             onChange('dateRange', [
-              dates[0].format('YYYY-MM-DD'),
-              dates[1].format('YYYY-MM-DD'),
+              dates[0]?.format('YYYY-MM-DD'),
+              dates[1]?.format('YYYY-MM-DD'),
             ]);
           } else {
             onChange('dateRange', undefined);
@@ -45,6 +46,7 @@ const TransactionFiltersBar: React.FC<Props> = ({ filters, onChange }) => {
         }}
         format="YYYY-MM-DD"
         allowClear
+        disabledDate={(current) => current && current > dayjs().endOf('day')}
       />
     </div>
   );

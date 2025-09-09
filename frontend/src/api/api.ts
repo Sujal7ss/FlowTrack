@@ -179,9 +179,16 @@ export const transactionsAPI = {
     }
   },
 
-  aggregations: async () => {
+  aggregations: async (params?: {
+    start?: string;
+    end?: string;
+  }) => {
     try {
-      const response = await api.get('/transactions/aggregations');
+      const queryParams: Record<string, string | undefined> = {};
+      if (params?.start) queryParams.start = params.start;
+      if (params?.end) queryParams.end = params.end;
+
+      const response = await api.get('/transactions/aggregations', { params: queryParams });
       return response.data;
     } catch (error: unknown) {
       const err = error as { response?: { data?: { message?: string } } };

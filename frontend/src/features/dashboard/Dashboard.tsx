@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Row, Col, Card, Statistic, DatePicker, Space, Typography } from 'antd';
+import { Row, Col, Card, Statistic, DatePicker, Space, Typography, Button } from 'antd';
 import { ArrowUpOutlined, ArrowDownOutlined, DollarOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { useAggregations } from '../../hooks/transaction';
@@ -12,19 +12,42 @@ const { Title } = Typography;
 
 const Dashboard: React.FC = () => {
   const [dateRange, setDateRange] = useState<[string, string] | undefined>();
-  
+  const [activeFilter, setActiveFilter] = useState<'today' | 'month' | 'year' | 'custom'>('custom');
+
   const { data, isLoading, error, refetch } = useAggregations(dateRange);
   console.log(data)
-  
+
   const handleDateRangeChange = (dates: any) => {
     if (dates && dates.length === 2) {
       setDateRange([
         dates[0].format('YYYY-MM-DD'),
         dates[1].format('YYYY-MM-DD'),
       ]);
+      setActiveFilter('custom');
     } else {
       setDateRange(undefined);
+      setActiveFilter('custom');
     }
+  };
+
+  const handleTodayClick = () => {
+    const today = dayjs().format('YYYY-MM-DD');
+    setDateRange([today, today]);
+    setActiveFilter('today');
+  };
+
+  const handleMonthClick = () => {
+    const startOfMonth = dayjs().startOf('month').format('YYYY-MM-DD');
+    const endOfMonth = dayjs().endOf('month').format('YYYY-MM-DD');
+    setDateRange([startOfMonth, endOfMonth]);
+    setActiveFilter('month');
+  };
+
+  const handleYearClick = () => {
+    const startOfYear = dayjs().startOf('year').format('YYYY-MM-DD');
+    const endOfYear = dayjs().endOf('year').format('YYYY-MM-DD');
+    setDateRange([startOfYear, endOfYear]);
+    setActiveFilter('year');
   };
 
   if (error) {
@@ -37,11 +60,30 @@ const Dashboard: React.FC = () => {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <Title level={2} className="mb-0">Dashboard</Title>
           <Space>
+            <Button
+              type={activeFilter === 'today' ? 'primary' : 'default'}
+              onClick={handleTodayClick}
+            >
+              Today
+            </Button>
+            <Button
+              type={activeFilter === 'month' ? 'primary' : 'default'}
+              onClick={handleMonthClick}
+            >
+              Month
+            </Button>
+            <Button
+              type={activeFilter === 'year' ? 'primary' : 'default'}
+              onClick={handleYearClick}
+            >
+              Year
+            </Button>
             <RangePicker
               onChange={handleDateRangeChange}
               placeholder={['Start Date', 'End Date']}
               allowClear
               format="YYYY-MM-DD"
+              disabledDate={(current) => current && current > dayjs().endOf('day')}
             />
           </Space>
         </div>

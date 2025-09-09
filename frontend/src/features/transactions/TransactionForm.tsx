@@ -211,6 +211,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
                 onChange={(date) => field.onChange(date?.format('YYYY-MM-DD'))}
                 className="w-full"
                 format="YYYY-MM-DD"
+                disabledDate={(current) => current && current > dayjs().endOf('day')}
               />
             )}
           />

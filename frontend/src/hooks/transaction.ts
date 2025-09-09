@@ -151,8 +151,12 @@ export const useAggregations = (dateRange?: [string, string]) => {
     setLoading(true);
     setError(null);
     try {
-      // Fetch aggregations from the backend
-      const aggregationsData = await transactionsAPI.aggregations();
+      // Fetch aggregations from the backend with date range filtering
+      const params = dateRange && dateRange.length === 2 ? {
+        start: dateRange[0],
+        end: dateRange[1]
+      } : undefined;
+      const aggregationsData = await transactionsAPI.aggregations(params);
       setData(aggregationsData);
     } catch (err: unknown) {
       const errorMessage =

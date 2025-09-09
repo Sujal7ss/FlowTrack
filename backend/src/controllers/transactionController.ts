@@ -146,15 +146,26 @@ export const deleteTransaction = async (req: Request, res: Response) => {
  * Retrieves aggregated data for the authenticated user's transactions.
  *
  * Computes total income, total expense, net amount, category breakdown, and trend data.
+ * Supports date range filtering via query parameters 'start' and 'end'.
  *
- * @param req - The Express request object.
+ * @param req - The Express request object with optional start and end query parameters.
  * @param res - The Express response object.
  * @returns A JSON response with aggregated transaction data.
  */
 export const getAggregations = async (req: Request, res: Response) => {
   const userId = (req as any).user.id;
+  const matchFilter: any = { userId: userId };
+
+  // Add date range filtering if provided
+  if (req.query.start) {
+    matchFilter.date = { ...matchFilter.date, $gte: new Date(String(req.query.start)) };
+  }
+  if (req.query.end) {
+    matchFilter.date = { ...matchFilter.date, $lte: new Date(String(req.query.end)) };
+  }
+
   const aggregationResult = await Transaction.aggregate([
-    { $match: { userId: userId } },
+    { $match: matchFilter },
     {
       $facet: {
         summary: [
