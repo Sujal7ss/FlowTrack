@@ -58,3 +58,39 @@ export interface AggregationsResponse {
     netAmount: number;
   };
 }
+
+export interface TransactionFilters {
+  type?: 'income' | 'expense';
+  category?: string;
+  dateRange?: [string, string];
+  page?: number;
+  limit?: number;
+}
+
+export interface TransactionRequest {
+  type: 'income' | 'expense';
+  amount: number;
+  category: string;
+  description: string;
+  date: string;
+}
+export interface TransactionsResponse {
+  data: Transaction[];
+  pagination: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}
+
+export interface Transaction {
+  id: string;
+  type: 'income' | 'expense';
+  amount: number;
+  category: string;
+  description: string;
+  date: string;
+  createdAt: string;
+  updatedAt: string;
+}s

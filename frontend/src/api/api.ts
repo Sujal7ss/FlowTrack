@@ -1,4 +1,5 @@
 import axios from 'axios';
+import type { Transaction } from '../types';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api';
 
@@ -59,6 +60,16 @@ export const authAPI = {
   },
 };
 
+// Helper function to transform transaction object from backend format (_id) to frontend format (id)
+const transformTransaction = (transaction: Record<string, unknown>): Transaction => {
+  if (!transaction) return transaction as Transaction;
+  const { _id, ...rest } = transaction;
+  return {
+    ...rest,
+    id: (_id as string)?.toString() || (_id as string),
+  } as Transaction;
+};
+
 // Transactions API calls
 export const transactionsAPI = {
   create: async (transactionData: {
@@ -70,22 +81,45 @@ export const transactionsAPI = {
   }) => {
     try {
       const response = await api.post('/transactions', transactionData);
-      // Adjusted to match backend controller response format
-      return { data: response.data, meta: null };
+      // Transform the transaction to have id instead of _id
+      const transformedTransaction = transformTransaction(response.data);
+      return { transaction: transformedTransaction };
     } catch (error: unknown) {
       const err = error as { response?: { data?: { message?: string } } };
       throw new Error(err.response?.data?.message || 'Failed to create transaction');
     }
   },
 
-  list: async (params?: { page?: number; limit?: number; category?: string; type?: string }) => {
+  list: async (params?: {
+    page?: number;
+    limit?: number;
+    category?: string;
+    type?: string;
+    dateRange?: [string, string];
+  }) => {
     try {
-      const response = await api.get('/transactions', { params });
+      // Transform frontend params to backend expected format
+      const queryParams: Record<string, string | number | undefined> = {
+        page: params?.page,
+        limit: params?.limit,
+        category: params?.category,
+        type: params?.type,
+      };
+
+      // Handle date range
+      if (params?.dateRange && params.dateRange.length === 2) {
+        queryParams.start = params.dateRange[0];
+        queryParams.end = params.dateRange[1];
+      }
+
+      const response = await api.get('/transactions', { params: queryParams });
       // Transform backend response to match frontend types
       const backendData = response.data;
       const totalPages = Math.ceil((backendData.meta?.total || 0) / (backendData.meta?.limit || 10));
+      // Transform each transaction to have id instead of _id
+      const transformedData = backendData.data.map(transformTransaction);
       return {
-        data: backendData.data,
+        data: transformedData,
         pagination: {
           page: backendData.meta?.page || 1,
           limit: backendData.meta?.limit || 10,
@@ -102,7 +136,9 @@ export const transactionsAPI = {
   get: async (id: string) => {
     try {
       const response = await api.get(`/transactions/${id}`);
-      return response.data;
+      // Transform the transaction to have id instead of _id
+      const transformedTransaction = transformTransaction(response.data);
+      return transformedTransaction;
     } catch (error: unknown) {
       const err = error as { response?: { data?: { message?: string } } };
       throw new Error(err.response?.data?.message || 'Failed to fetch transaction');
@@ -121,7 +157,9 @@ export const transactionsAPI = {
     }
     try {
       const response = await api.put(`/transactions/${id}`, transactionData);
-      return response.data;
+      // Transform the transaction to have id instead of _id
+      const transformedTransaction = transformTransaction(response.data);
+      return { transaction: transformedTransaction };
     } catch (error: unknown) {
       const err = error as { response?: { data?: { message?: string } } };
       throw new Error(err.response?.data?.message || 'Failed to update transaction');

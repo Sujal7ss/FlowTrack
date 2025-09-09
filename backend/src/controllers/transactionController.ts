@@ -69,12 +69,15 @@ export const listTransactions = async (req: Request, res: Response) => {
     filter.date = { ...filter.date, $lte: new Date(String(req.query.end)) };
   }
 
+  if(req.query.type){
+    filter.type = String(req.query.type);
+  }
   if (req.query.category) {
     filter.category = String(req.query.category);
   }
 
   const [data, total] = await Promise.all([
-    Transaction.find(filter).sort({ date: -1 }).skip(skip).limit(limit).lean(),
+    Transaction.find(filter).sort({ date: -1, createdAt: -1 }).skip(skip).limit(limit).lean(),
     Transaction.countDocuments(filter)
   ]);
 
