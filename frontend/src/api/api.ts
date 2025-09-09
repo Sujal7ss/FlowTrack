@@ -59,3 +59,95 @@ export const authAPI = {
   },
 };
 
+// Transactions API calls
+export const transactionsAPI = {
+  create: async (transactionData: {
+    amount: number;
+    description: string;
+    category: string;
+    type: 'income' | 'expense';
+    date: string;
+  }) => {
+    try {
+      const response = await api.post('/transactions', transactionData);
+      // Adjusted to match backend controller response format
+      return { data: response.data, meta: null };
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      throw new Error(err.response?.data?.message || 'Failed to create transaction');
+    }
+  },
+
+  list: async (params?: { page?: number; limit?: number; category?: string; type?: string }) => {
+    try {
+      const response = await api.get('/transactions', { params });
+      // Transform backend response to match frontend types
+      const backendData = response.data;
+      const totalPages = Math.ceil((backendData.meta?.total || 0) / (backendData.meta?.limit || 10));
+      return {
+        data: backendData.data,
+        pagination: {
+          page: backendData.meta?.page || 1,
+          limit: backendData.meta?.limit || 10,
+          total: backendData.meta?.total || 0,
+          totalPages: totalPages
+        }
+      };
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      throw new Error(err.response?.data?.message || 'Failed to fetch transactions');
+    }
+  },
+
+  get: async (id: string) => {
+    try {
+      const response = await api.get(`/transactions/${id}`);
+      return response.data;
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      throw new Error(err.response?.data?.message || 'Failed to fetch transaction');
+    }
+  },
+
+  update: async (id: string | undefined, transactionData: Partial<{
+    amount: number;
+    description: string;
+    category: string;
+    type: 'income' | 'expense';
+    date: string;
+  }>) => {
+    if (!id) {
+      throw new Error('Transaction ID is undefined');
+    }
+    try {
+      const response = await api.put(`/transactions/${id}`, transactionData);
+      return response.data;
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      throw new Error(err.response?.data?.message || 'Failed to update transaction');
+    }
+  },
+
+  delete: async (id: string | undefined) => {
+    if (!id) {
+      throw new Error('Transaction ID is undefined');
+    }
+    try {
+      const response = await api.delete(`/transactions/${id}`);
+      return response.data;
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      throw new Error(err.response?.data?.message || 'Failed to delete transaction');
+    }
+  },
+
+  aggregations: async () => {
+    try {
+      const response = await api.get('/transactions/aggregations');
+      return response.data;
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      throw new Error(err.response?.data?.message || 'Failed to fetch aggregations');
+    }
+  },
+};

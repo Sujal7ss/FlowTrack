@@ -12,7 +12,8 @@ import {
   listTransactions,
   getTransaction,
   updateTransaction,
-  deleteTransaction
+  deleteTransaction,
+  getAggregations
 } from '../controllers/transactionController';
 import { requireAuth } from '../middlewares/auth';
 
@@ -23,6 +24,9 @@ router.post('/', requireAuth, createTransaction);
 
 // List transactions with pagination and filtering
 router.get('/', requireAuth, listTransactions);
+
+// Get aggregations for authenticated user
+router.get('/aggregations', requireAuth, getAggregations);
 
 // Get a specific transaction by ID
 router.get('/:id', requireAuth, getTransaction);

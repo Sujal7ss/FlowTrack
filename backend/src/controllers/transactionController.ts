@@ -138,3 +138,119 @@ export const deleteTransaction = async (req: Request, res: Response) => {
 
   res.status(204).send();
 };
+
+/**
+ * Retrieves aggregated data for the authenticated user's transactions.
+ *
+ * Computes total income, total expense, net amount, category breakdown, and trend data.
+ *
+ * @param req - The Express request object.
+ * @param res - The Express response object.
+ * @returns A JSON response with aggregated transaction data.
+ */
+export const getAggregations = async (req: Request, res: Response) => {
+  const userId = (req as any).user.id;
+  const aggregationResult = await Transaction.aggregate([
+    { $match: { userId: userId } },
+    {
+      $facet: {
+        summary: [
+          {
+            $group: {
+              _id: null,
+              totalIncome: {
+                $sum: {
+                  $cond: [{ $eq: ['$type', 'income'] }, '$amount', 0]
+                }
+              },
+              totalExpense: {
+                $sum: {
+                  $cond: [{ $eq: ['$type', 'expense'] }, '$amount', 0]
+                }
+              }
+            }
+          },
+          {
+            $project: {
+              _id: 0,
+              totalIncome: 1,
+              totalExpense: 1,
+              netAmount: { $subtract: ['$totalIncome', '$totalExpense'] }
+            }
+          }
+        ],
+        categoryBreakdown: [
+          {
+            $group: {
+              _id: '$category',
+              amount: { $sum: '$amount' },
+              count: { $sum: 1 }
+            }
+          },
+          {
+            $project: {
+              _id: 0,
+              category: '$_id',
+              amount: 1,
+              count: 1
+            }
+          }
+        ],
+        trendData: [
+          {
+            $group: {
+              _id: {
+                $dateToString: { format: '%Y-%m-%d', date: '$date' }
+              },
+              income: {
+                $sum: {
+                  $cond: [{ $eq: ['$type', 'income'] }, '$amount', 0]
+                }
+              },
+              expense: {
+                $sum: {
+                  $cond: [{ $eq: ['$type', 'expense'] }, '$amount', 0]
+                }
+              }
+            }
+          },
+          {
+            $project: {
+              _id: 0,
+              date: '$_id',
+              income: 1,
+              expense: 1,
+              net: { $subtract: ['$income', '$expense'] }
+            }
+          },
+          { $sort: { date: 1 } }
+        ]
+      }
+    }
+  ]);
+
+  const result = aggregationResult[0];
+
+  // If no transactions, return empty aggregations
+  if (!result) {
+    return res.json({
+      categoryBreakdown: [],
+      trendData: [],
+      summary: {
+        totalIncome: 0,
+        totalExpense: 0,
+        netAmount: 0
+      }
+    });
+  }
+
+  res.json({
+    categoryBreakdown: result.categoryBreakdown || [],
+    trendData: result.trendData || [],
+    summary: result.summary[0] || {
+      totalIncome: 0,
+      totalExpense: 0,
+      netAmount: 0
+    }
+  });
+};
