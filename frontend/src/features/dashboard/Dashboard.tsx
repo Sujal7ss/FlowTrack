@@ -14,8 +14,8 @@ const Dashboard: React.FC = () => {
   const [dateRange, setDateRange] = useState<[string, string] | undefined>();
   
   const { data, isLoading, error, refetch } = useAggregations(dateRange);
-
   console.log(data)
+  
   const handleDateRangeChange = (dates: any) => {
     if (dates && dates.length === 2) {
       setDateRange([

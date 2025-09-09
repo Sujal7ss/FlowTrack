@@ -1,5 +1,5 @@
-import React from 'react';
-import { Form, Input, Button, Card, Typography } from 'antd';
+import React, { useState } from 'react';
+import { Form, Input, Button, Card, Typography, message } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { useLogin } from "../../hooks/auth"
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -12,14 +12,18 @@ const Login: React.FC = () => {
   const location = useLocation();
   const loginMutation = useLogin();
   const [form] = Form.useForm();
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const onSubmit = async (values: LoginRequest) => {
+    setErrorMessage(null);
     try {
       await loginMutation.mutate(values);
       const from = (location.state as { from?: { pathname: string } })?.from?.pathname || '/dashboard';
       navigate(from, { replace: true });
-    } catch {
-      // Error handled by mutation
+    } catch (error: unknown) {
+      const msg = (error as Error)?.message || 'Login failed';
+      setErrorMessage(msg);
+      message.error(msg);
     }
   };
 
@@ -54,6 +58,8 @@ const Login: React.FC = () => {
                 { required: true, message: 'Please enter your email' },
                 { type: 'email', message: 'Please enter a valid email address' },
               ]}
+              validateStatus={errorMessage ? 'error' : ''}
+              help={errorMessage}
             >
               <Input
                 prefix={<UserOutlined />}
@@ -69,6 +75,8 @@ const Login: React.FC = () => {
                 { required: true, message: 'Please enter your password' },
                 { min: 6, message: 'Password must be at least 6 characters' },
               ]}
+              validateStatus={errorMessage ? 'error' : ''}
+              help={errorMessage}
             >
               <Input.Password
                 prefix={<LockOutlined />}

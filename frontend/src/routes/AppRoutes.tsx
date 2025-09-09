@@ -6,13 +6,15 @@ import Signup from '../features/auth/Signup';
 import Dashboard from '../features/dashboard/Dashboard';
 import TransactionsPage from '../features/transactions/TransactionsPage';
 import ReceiptUpload from '../features/receipts/ReceiptUpload';
+import LandingPage from '../features/landing/LandingPage';
 
 const AppRoutes: React.FC = () => {
   return (
     <Routes>
+      <Route path="/landing" element={<LandingPage />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
-      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+      <Route path="/" element={<Navigate to="/landing" replace />} />
       <Route
         path="/dashboard"
         element={

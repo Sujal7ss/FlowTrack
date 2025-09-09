@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Image, Typography, Divider } from 'antd';
+import { Card, Image, Typography, Divider, Row, Col } from 'antd';
 import type { Receipt } from '../../types';
 
 const { Text, Paragraph } = Typography;
@@ -13,9 +13,9 @@ interface ReceiptPreviewProps {
 const ReceiptPreview: React.FC<ReceiptPreviewProps> = ({ receipt }) => {
   return (
     <Card title="Receipt Preview" className="mb-4">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <Row gutter={[24, 24]}>
         {/* Receipt Image */}
-        <div>
+        <Col xs={24} lg={12}>
           <Text strong>Receipt Image:</Text>
           <div className="mt-2">
             {receipt.url.toLowerCase().includes('.pdf') ? (
@@ -31,17 +31,17 @@ const ReceiptPreview: React.FC<ReceiptPreviewProps> = ({ receipt }) => {
               />
             )}
           </div>
-        </div>
+        </Col>
 
         {/* Extracted Text */}
-        <div>
+        <Col xs={24} lg={12}>
           <Text strong>Extracted Text:</Text>
           <Divider className="my-2" />
           <Paragraph className="whitespace-pre-wrap">
             {receipt.extractedText || 'No text extracted from this receipt.'}
           </Paragraph>
-        </div>
-      </div>
+        </Col>
+      </Row>
     </Card>
   );
 };

@@ -43,8 +43,8 @@ export const authAPI = {
       const response = await api.post('/auth/register', userData);
       return response.data;
     } catch (error: unknown) {
-      const err = error as { response?: { data?: { message?: string } } };
-      throw new Error(err.response?.data?.message || 'Registration failed');
+      const err = error as { response?: { data?: { message?: string; error?: string } } };
+      throw new Error(err.response?.data?.message || err.response?.data?.error || 'Registration failed');
     }
   },
 
@@ -54,8 +54,8 @@ export const authAPI = {
       console.log(response)
       return response.data;
     } catch (error: unknown) {
-      const err = error as { response?: { data?: { message?: string } } };
-      throw new Error(err.response?.data?.message || 'Login failed');
+      const err = error as { response?: { data?: { message?: string; error?: string } } };
+      throw new Error(err.response?.data?.message || err.response?.data?.error || 'Login failed');
     }
   },
 };
