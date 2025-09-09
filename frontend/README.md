@@ -67,3 +67,20 @@ export default tseslint.config([
   },
 ])
 ```
+
+
+react, react-dom → Core React
+
+react-router-dom → Routing
+
+axios → API calls (if you prefer fetch, you can skip this)
+
+dayjs → Date handling
+
+antd → Ant Design v5 (UI library)
+
+@ant-design/icons → Ant Design icons
+
+react-hook-form → Forms
+
+zod → Schema validation
